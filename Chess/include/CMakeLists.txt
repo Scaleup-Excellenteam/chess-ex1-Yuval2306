@@ -3,4 +3,4 @@
         "Board.h"
         "Game.h")
 
-target_include_directories (Chess PRIVATE ${CMAKE_CURRENT_LIST_DIR})
+target_include_directories (Chess PRIVATE ../../../../chess-ex1-Yuval2306-feature-chess-implementation/Chess/include)
