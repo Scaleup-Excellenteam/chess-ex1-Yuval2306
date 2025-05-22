@@ -13,6 +13,9 @@ private:
     bool m_blackLeftRookMoved = false;
     bool m_blackRightRookMoved = false;
 
+    // Helper method for pawn promotion
+    void promotePawn(int row, int col, char promotionPiece);
+
 public:
     Board(const std::string& boardString);
 
@@ -28,6 +31,9 @@ public:
     // Move piece from source to destination
     void movePiece(int srcRow, int srcCol, int dstRow, int dstCol);
 
+    // Overloaded version for pawn promotion
+    void movePiece(int srcRow, int srcCol, int dstRow, int dstCol, char promotionPiece);
+
     // Check if king is in check
     bool isKingInCheck(bool isWhite) const;
 
@@ -42,7 +48,6 @@ public:
 
     // Print the board (for debugging)
     void printBoard() const;
-    void debugBoard() const;
 
     // Get a copy of the board
     Board getCopy() const;
