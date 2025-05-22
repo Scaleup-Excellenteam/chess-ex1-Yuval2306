@@ -1,0 +1,6 @@
+Evaluating 20 possible moves...
+Found 20 valid moves.
+Top 3 recommended moves:
+1. Move from g8 to h6 with score 0
+2. Move from g8 to f6 with score 0
+3. Move from b8 to c6 with score 0

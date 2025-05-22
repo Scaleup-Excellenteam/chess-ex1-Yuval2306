@@ -1,6 +1,11 @@
-﻿target_sources (Chess PRIVATE "Chess.h"
+﻿target_sources (ChessGame  PRIVATE
+        "Chess.h"
         "Piece.h"
         "Board.h"
-        "Game.h")
+        "Game.h"
+        "MoveRecommender.h"
+        "PriorityQueue.h"
+        "Move.h"
+)
 
-target_include_directories (Chess PRIVATE ${CMAKE_CURRENT_LIST_DIR})
+target_include_directories (ChessGame  PRIVATE ${CMAKE_CURRENT_LIST_DIR})

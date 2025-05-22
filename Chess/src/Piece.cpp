@@ -43,7 +43,7 @@ bool Pawn::isValidMove(const Board& board, int srcRow, int srcCol, int dstRow, i
         bool middleEmpty = board.getPiece(srcRow + direction, srcCol) == nullptr;
         bool destEmpty = board.getPiece(dstRow, dstCol) == nullptr;
         bool valid = middleEmpty && destEmpty;
-        std::cout << "Two squares forward: " << (valid ? "valid" : "invalid") << std::endl;
+        //std::cout << "Two squares forward: " << (valid ? "valid" : "invalid") << std::endl;
         return valid;
     }
 
@@ -51,11 +51,11 @@ bool Pawn::isValidMove(const Board& board, int srcRow, int srcCol, int dstRow, i
     if (std::abs(srcCol - dstCol) == 1 && srcRow + direction == dstRow) {
         auto targetPiece = board.getPiece(dstRow, dstCol);
         bool valid = targetPiece != nullptr && targetPiece->isWhite() != m_isWhite;
-        std::cout << "Diagonal capture: " << (valid ? "valid" : "invalid") << std::endl;
+        //std::cout << "Diagonal capture: " << (valid ? "valid" : "invalid") << std::endl;
         return valid;
     }
 
-    std::cout << "No valid pawn move found" << std::endl;
+    //std::cout << "No valid pawn move found" << std::endl;
     return false;
 }
 
@@ -67,7 +67,7 @@ bool Rook::isValidMove(const Board& board, int srcRow, int srcCol, int dstRow, i
 
     // Check if the path is clear
     bool pathClear = isPathClear(board, srcRow, srcCol, dstRow, dstCol);
-    std::cout << "Path clear: " << (pathClear ? "yes" : "no") << std::endl;
+    //std::cout << "Path clear: " << (pathClear ? "yes" : "no") << std::endl;
     return pathClear;
 }
 

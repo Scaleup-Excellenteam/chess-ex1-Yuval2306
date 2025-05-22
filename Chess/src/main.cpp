@@ -1,19 +1,29 @@
 #include "Chess.h"
 #include "Game.h"
 #include <iostream>
+#include <string>
 
 int main()
 {
-    string board = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr";
-//	string board = "##########K###############################R#############r#r#####";
+    std::string board = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr";
+//  std::string board = "##########K###############################R#############r#r#####";
 
     std::cout << "=== Chess Game Initialization ===" << std::endl;
     Chess a(board);
     Game chessGame(board);
 
-    int codeResponse = 0;
-    string res = a.getInput();
+    // Let the user choose search depth for move recommendations
+    int searchDepth;
+    std::cout << "Enter search depth for move recommendations (1-3): ";
+    std::cin >> searchDepth;
+    chessGame.setSearchDepth(searchDepth);
 
+    // Clear the input buffer
+    std::cin.clear();
+    std::cin.ignore(10000, '\n');
+
+    int codeResponse = 0;
+    std::string res = a.getInput();
 
     while (res != "exit")
     {
@@ -36,6 +46,6 @@ int main()
         res = a.getInput();
     }
 
-    cout << endl << "Exiting " << endl;
+    std::cout << std::endl << "Exiting " << std::endl;
     return 0;
 }

@@ -54,12 +54,66 @@ void Board::removePiece(int row, int col) {
     }
 }
 
+// Original movePiece method (keep this exactly as is)
 void Board::movePiece(int srcRow, int srcCol, int dstRow, int dstCol) {
     auto piece = getPiece(srcRow, srcCol);
     if (piece) {
         updatePieceMoved(srcRow, srcCol, piece);
         setPiece(dstRow, dstCol, piece);
         removePiece(srcRow, srcCol);
+    }
+}
+
+// New method for pawn promotion - private helper
+void Board::promotePawn(int row, int col, char promotionPiece) {
+    auto pawn = getPiece(row, col);
+    if (!pawn || (std::toupper(pawn->getSymbol()) != 'P')) {
+        throw std::invalid_argument("No pawn at the specified position");
+    }
+
+    bool isWhite = pawn->isWhite();
+    std::shared_ptr<Piece> newPiece = nullptr;
+
+    // Convert to uppercase for consistency
+    promotionPiece = std::toupper(promotionPiece);
+
+    // Create the new piece based on the promotion choice
+    switch (promotionPiece) {
+        case 'Q':
+            newPiece = std::make_shared<Queen>(isWhite);
+            break;
+        case 'R':
+            newPiece = std::make_shared<Rook>(isWhite);
+            break;
+        case 'B':
+            newPiece = std::make_shared<Bishop>(isWhite);
+            break;
+        case 'N':
+            newPiece = std::make_shared<Knight>(isWhite);
+            break;
+        default:
+            throw std::invalid_argument("Invalid promotion piece");
+    }
+
+    // Replace the pawn with the new piece
+    setPiece(row, col, newPiece);
+}
+
+// Overloaded movePiece to handle promotion
+void Board::movePiece(int srcRow, int srcCol, int dstRow, int dstCol, char promotionPiece) {
+    auto piece = getPiece(srcRow, srcCol);
+    if (piece) {
+        updatePieceMoved(srcRow, srcCol, piece);
+        setPiece(dstRow, dstCol, piece);
+        removePiece(srcRow, srcCol);
+
+        // Handle pawn promotion if needed
+        if (promotionPiece != 0 && std::toupper(piece->getSymbol()) == 'P') {
+            // Check if pawn is at the end of the board
+            if ((piece->isWhite() && dstRow == 7) || (!piece->isWhite() && dstRow == 0)) {
+                promotePawn(dstRow, dstCol, promotionPiece);
+            }
+        }
     }
 }
 
@@ -179,4 +233,3 @@ void Board::printBoard() const {
         std::cout << std::endl;
     }
 }
-

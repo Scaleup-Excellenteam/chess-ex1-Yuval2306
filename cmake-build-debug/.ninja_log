@@ -1,0 +1,9 @@
+# ninja log v5
+5	67	7679591368245329	CMakeFiles/ChessGame.dir/Chess/src/MoveRecommender.cpp.obj	bc7b9f69dd58bb95
+7	1118	7679620679645910	CMakeFiles/ChessGame.dir/Chess/src/Game.cpp.obj	ad482c7df79d67ef
+46	2779	7679529448089163	CMakeFiles/ChessGame.dir/Chess/src/Board.cpp.obj	faad4db9ea55708c
+5	1108	7679535533766859	CMakeFiles/ChessGame.dir/Chess/src/Piece.cpp.obj	98d76d5006fd8ed9
+1906	2131	7679623943856721	ChessGame.exe	8f427bc9b11e6e3a
+10	3566	7679529456041490	CMakeFiles/ChessGame.dir/Chess/src/Chess.cpp.obj	ccf70cba4aa6b695
+1	373	7692809322371929	build.ninja	e85cfcc602188074
+3	1905	7679623941664677	CMakeFiles/ChessGame.dir/Chess/src/main.cpp.obj	da3459ef1a0ac073
