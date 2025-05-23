@@ -6,6 +6,11 @@
         "MoveRecommender.h"
         "PriorityQueue.h"
         "Move.h"
+        "ThreadPool.h"
+        "ThreadSafePriorityQueue.h"
+        "ParallelMoveRecommender.h"
+        "AutoPlayer.h"
+        "Benchmark.h"
 )
 
 target_include_directories (ChessGame  PRIVATE ${CMAKE_CURRENT_LIST_DIR})

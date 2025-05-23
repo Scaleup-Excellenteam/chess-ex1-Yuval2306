@@ -4,47 +4,37 @@
 #include <string>
 #include <iostream>
 #include <iomanip>
+#include <memory>
+#include "Game.h"
+#include "Chess.h"
+#include "AutoPlayer.h"
 
 struct BenchmarkResult {
     int numThreads;
     long long totalTimeMs;
     std::vector<long long> moveTimes;
-
-    void print() const {
-        std::cout << "\n=== Benchmark Results for " << numThreads << " threads ===" << std::endl;
-        std::cout << "Total time: " << totalTimeMs << " ms" << std::endl;
-        std::cout << "Individual move times:" << std::endl;
-
-        for (size_t i = 0; i < moveTimes.size(); ++i) {
-            std::cout << "  Move " << (i + 1) << ": " << moveTimes[i] << " ms" << std::endl;
-        }
-
-        if (!moveTimes.empty()) {
-            long long avg = totalTimeMs / moveTimes.size();
-            std::cout << "Average time per move: " << avg << " ms" << std::endl;
-        }
-    }
 };
 
 class Benchmark {
 public:
+    // Main function that runs benchmarks with different thread counts and prints comparison
     static void runBenchmarks(const std::string& boardString, int searchDepth, int numMoves) {
         std::cout << "\n====== PERFORMANCE BENCHMARKS ======" << std::endl;
         std::cout << "Search depth: " << searchDepth << std::endl;
         std::cout << "Number of moves: " << numMoves << std::endl;
 
-        std::vector<int> threadCounts = {0, 2, 4, 8}; // 0 means sequential
+        std::vector<int> threadCounts = {0, 2, 4, 8};
         std::vector<BenchmarkResult> results;
 
         for (int threads : threadCounts) {
             results.push_back(runSingleBenchmark(boardString, searchDepth, numMoves, threads));
         }
 
-        // Print comparison
         printComparison(results);
     }
 
 private:
+    // Runs a single benchmark test with specified number of threads and measures performance
     static BenchmarkResult runSingleBenchmark(const std::string& boardString,
                                               int searchDepth, int numMoves, int numThreads) {
         BenchmarkResult result;
@@ -54,7 +44,7 @@ private:
         std::unique_ptr<Game> game;
         if (numThreads == 0) {
             std::cout << "\nRunning sequential benchmark..." << std::endl;
-            game = std::make_unique<Game>(boardString, 1); // 1 thread = sequential
+            game = std::make_unique<Game>(boardString, 1);
         } else {
             std::cout << "\nRunning parallel benchmark with " << numThreads << " threads..." << std::endl;
             game = std::make_unique<Game>(boardString, numThreads);
@@ -62,7 +52,7 @@ private:
 
         game->setSearchDepth(searchDepth);
 
-        AutoPlayer autoPlayer(false); // Use best move selection
+        AutoPlayer autoPlayer(false);
         Chess chessUI(boardString);
 
         auto totalStart = std::chrono::high_resolution_clock::now();
@@ -73,7 +63,7 @@ private:
         while (moveCount < numMoves) {
             auto moveStart = std::chrono::high_resolution_clock::now();
 
-            // Get recommended moves (this is where timing matters)
+            // Get recommended moves
             auto recommendedMoves = game->recommendMoves();
 
             if (recommendedMoves.empty()) {
@@ -89,16 +79,35 @@ private:
 
             auto moveEnd = std::chrono::high_resolution_clock::now();
             auto moveDuration = std::chrono::duration_cast<std::chrono::milliseconds>(moveEnd - moveStart);
-            result.moveTimes.push_back(moveDuration.count());
-
-            // Update UI (without actually displaying)
-            chessUI.setCodeResponse(codeResponse);
 
             if (codeResponse == 41 || codeResponse == 42) {
+                result.moveTimes.push_back(moveDuration.count());
                 moveCount++;
+
+                // Update the board string for the Chess UI
+                if (numThreads == 0) {
+                    // For sequential benchmark, recreate the game to reset state
+                    game = std::make_unique<Game>(boardString, 1);
+                    game->setSearchDepth(searchDepth);
+
+                }
             } else {
                 std::cout << "Invalid move generated! Code: " << codeResponse << std::endl;
-                break;
+                std::cout << "Attempted move: " << move << std::endl;
+                // Try to continue with another move from the recommendations
+                if (recommendedMoves.size() > 1) {
+                    // Try the second-best move
+                    move = recommendedMoves[1].toString();
+                    codeResponse = game->validateMove(move);
+                    if (codeResponse == 41 || codeResponse == 42) {
+                        result.moveTimes.push_back(moveDuration.count());
+                        moveCount++;
+                    } else {
+                        break;
+                    }
+                } else {
+                    break;
+                }
             }
         }
 
@@ -107,7 +116,7 @@ private:
 
         return result;
     }
-
+    // Prints a formatted comparison table of benchmark results with speedup calculations
     static void printComparison(const std::vector<BenchmarkResult>& results) {
         std::cout << "\n====== PERFORMANCE COMPARISON ======" << std::endl;
         std::cout << std::setw(10) << "Threads"

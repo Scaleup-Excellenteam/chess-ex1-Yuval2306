@@ -1,7 +1,6 @@
 #include "Piece.h"
 #include "Board.h"
 #include <cmath>
-#include <iostream>
 
 bool Piece::isPathClear(const Board& board, int srcRow, int srcCol, int dstRow, int dstCol) const {
     int rowDir = 0;

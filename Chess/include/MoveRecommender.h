@@ -36,7 +36,7 @@ private:
 };
 
 class MoveRecommender {
-private:
+protected:  // Changed from private to protected so ParallelMoveRecommender can access
     // Number of top moves to keep in the priority queue
     static constexpr int TOP_MOVES_COUNT = 5;
 
@@ -64,6 +64,9 @@ private:
         int index = getPieceValueIndex(pieceSymbol);
         return (index >= 0) ? PIECE_VALUES[index] : 0;
     }
+
+public:
+    MoveRecommender() {}
 
     // Calculate the score for a move at a specific depth
     int calculateMoveScore(const Board& board, const Move& move, int depth, bool isWhiteTurn, int maxDepth) {
@@ -140,7 +143,6 @@ private:
 
         // 5. If this is not the maximum depth, recursively evaluate opponent's responses
         if (depth < maxDepth) {
-            // Find the best move the opponent can make
             auto bestOpponentResponse = findBestMove(tempBoard, !isWhiteTurn, depth + 1, maxDepth);
 
             if (!bestOpponentResponse.empty()) {
@@ -153,11 +155,8 @@ private:
         return score;
     }
 
-public:
-    MoveRecommender() {}
-
     // Find the best moves for the current player
-    std::vector<Move> findBestMoves(const Board& board, bool isWhiteTurn, int maxDepth = 2) {
+    virtual std::vector<Move> findBestMoves(const Board& board, bool isWhiteTurn, int maxDepth = 2) {
         return findBestMove(board, isWhiteTurn, 0, maxDepth);
     }
 
@@ -184,6 +183,12 @@ public:
                             continue;
                         }
 
+                        // IMPORTANT: Check if there's a friendly piece at destination
+                        auto destPiece = board.getPiece(dstRow, dstCol);
+                        if (destPiece && destPiece->isWhite() == isWhiteTurn) {
+                            continue; // Can't capture own piece
+                        }
+
                         // Check if the move is valid for this piece
                         if (piece->isValidMove(board, srcRow, srcCol, dstRow, dstCol)) {
                             // Check if the move would put the player in check
@@ -198,7 +203,6 @@ public:
                             if (piece->getSymbol() == (isWhiteTurn ? 'P' : 'p')) {
                                 // If a pawn reaches the opposite end of the board
                                 if ((isWhiteTurn && dstRow == 7) || (!isWhiteTurn && dstRow == 0)) {
-                                    // Set a high score for promotion moves
                                     move.setScore(1000);
 
                                     // If this is at depth 0 (current player), throw exception
@@ -212,12 +216,10 @@ public:
                             int score = calculateMoveScore(board, move, currentDepth, isWhiteTurn, maxDepth);
                             move.setScore(score);
 
-                            // Add the move to the priority queue
                             try {
                                 bestMoves.push(move);
                             } catch (const QueueFullException& e) {
-                                // Queue is full, but we've already sorted by priority
-                                // so we can just ignore this exception
+
                             }
                         }
                     }
@@ -231,7 +233,6 @@ public:
             result.push_back(bestMoves.poll());
         }
 
-        // Moves are already in descending order of score because of the comparator
         return result;
     }
 };

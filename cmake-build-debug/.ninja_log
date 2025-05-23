@@ -5,5 +5,11 @@
 5	1108	7679535533766859	CMakeFiles/ChessGame.dir/Chess/src/Piece.cpp.obj	98d76d5006fd8ed9
 1906	2131	7679623943856721	ChessGame.exe	8f427bc9b11e6e3a
 10	3566	7679529456041490	CMakeFiles/ChessGame.dir/Chess/src/Chess.cpp.obj	ccf70cba4aa6b695
-1	373	7692809322371929	build.ninja	e85cfcc602188074
+1	373	7696788372839761	build.ninja	e85cfcc602188074
 3	1905	7679623941664677	CMakeFiles/ChessGame.dir/Chess/src/main.cpp.obj	da3459ef1a0ac073
+45	3130	7696796716630395	CMakeFiles/ChessGame.dir/Chess/src/Piece.cpp.obj	98d76d5006fd8ed9
+38	3154	7696796716881160	CMakeFiles/ChessGame.dir/Chess/src/Board.cpp.obj	faad4db9ea55708c
+52	3171	7696796717067269	CMakeFiles/ChessGame.dir/Chess/src/Game.cpp.obj	ad482c7df79d67ef
+30	4322	7696796728593818	CMakeFiles/ChessGame.dir/Chess/src/Chess.cpp.obj	ccf70cba4aa6b695
+21	4518	7696796730570140	CMakeFiles/ChessGame.dir/Chess/src/main.cpp.obj	da3459ef1a0ac073
+4519	5147	7696796736810233	ChessGame.exe	f6122ca6d69ce02c

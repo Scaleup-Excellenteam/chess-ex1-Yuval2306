@@ -1,14 +1,13 @@
 #include "Game.h"
-#include "MoveRecommender.h"
+#include "ParallelMoveRecommender.h"
 #include <iostream>
-#include <sstream>
 
-Game::Game(const std::string& boardString)
-        : m_board(boardString), m_isWhiteTurn(true), m_recommender(new MoveRecommender()), m_depthLevel(2) {}
+Game::Game(const std::string& boardString, int numThreads)
+        : m_board(boardString), m_isWhiteTurn(true),
+          m_recommender(std::make_unique<ParallelMoveRecommender>(numThreads)),
+          m_depthLevel(2) {}
 
-Game::~Game() {
-    delete m_recommender;
-}
+Game::~Game() = default;
 
 void Game::setSearchDepth(int depth) {
     if (depth >= 1 && depth <= 3) {
@@ -18,41 +17,37 @@ void Game::setSearchDepth(int depth) {
     }
 }
 
-// Convert from algebraic notation (e.g., 'a1') to array indices (0-7, 0-7)
-std::pair<int, int> Game::algebraicToIndices(char file, char rank) {
-    file = std::tolower(file);
-    int row = '8' - rank;
-    int col = file - 'a';
-    return { row, col };
-}
-
-void Game::recommendMoves() {
+std::vector<Move> Game::recommendMoves() {
     try {
-        std::vector<Move> bestMoves = m_recommender->findBestMoves(m_board, m_isWhiteTurn, m_depthLevel);
+        m_lastRecommendedMoves = m_recommender->findBestMoves(m_board, m_isWhiteTurn, m_depthLevel);
         std::cout << "\n===== RECOMMENDED MOVES =====" << std::endl;
 
-        int movesToShow = std::min(static_cast<int>(bestMoves.size()), 3);
+        int movesToShow = std::min(static_cast<int>(m_lastRecommendedMoves.size()), 3);
 
         if (movesToShow == 0) {
             std::cout << "No valid moves found!" << std::endl;
         } else {
             for (int i = 0; i < movesToShow; i++) {
-                std::cout << (i + 1) << ". " << bestMoves[i] << std::endl;
+                std::cout << (i + 1) << ". " << m_lastRecommendedMoves[i] << std::endl;
             }
         }
 
         std::cout << std::endl;
+        return m_lastRecommendedMoves;
     } catch (const PawnPromotionException& e) {
         std::cout << "\n" << e.what() << std::endl;
         std::cout << "Recommended promotion move: " << e.getMove() << std::endl << std::endl;
+        m_lastRecommendedMoves.clear();
+        m_lastRecommendedMoves.push_back(e.getMove());
+        return m_lastRecommendedMoves;
     } catch (const std::exception& e) {
         std::cerr << "\nError recommending moves: " << e.what() << std::endl << std::endl;
+        m_lastRecommendedMoves.clear();
+        return m_lastRecommendedMoves;
     }
 }
 
 int Game::validateMove(const std::string& input) {
-    // Before validating the move, recommend moves
-    recommendMoves();
 
     // Convert input to lowercase for consistency
     std::string lowerInput = input;

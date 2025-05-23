@@ -1,7 +1,7 @@
 #pragma once
 #include <iostream>
 #ifdef _WIN32
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 #include <string>
@@ -26,7 +26,6 @@ class Chess {
     void setFrames();
     void setPieces();
     void show() const;
-    void displayBoard() const;
     void showAskInput() const;
     bool isSame() const;
     bool isValid() const;
@@ -40,4 +39,6 @@ public:
     Chess& operator=(const Chess&) = delete;
     string getInput();
     void setCodeResponse(int codeResponse);
+    void displayBoard() const;
+
 };
