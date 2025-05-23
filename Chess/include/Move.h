@@ -8,21 +8,21 @@ private:
     int srcCol;
     int dstRow;
     int dstCol;
-    int score; // Score for this move based on our algorithm
-    char promotionPiece; // For pawn promotion, default is 0
+    int score;
+    char promotionPiece;
 
 public:
     Move(int src_row, int src_col, int dst_row, int dst_col, int move_score = 0, char promotion = 0)
             : srcRow(src_row), srcCol(src_col), dstRow(dst_row), dstCol(dst_col),
               score(move_score), promotionPiece(promotion) {}
 
-    // Convert to string in chess notation
+    // Convert to string in the game's notation
     std::string toString() const {
         std::string result;
-        result += static_cast<char>('a' + srcCol);
-        result += static_cast<char>('8' - srcRow);
-        result += static_cast<char>('a' + dstCol);
-        result += static_cast<char>('8' - dstRow);
+        result += static_cast<char>('a' + srcRow);  // Row as letter
+        result += static_cast<char>('1' + srcCol);  // Column as number
+        result += static_cast<char>('a' + dstRow);  // Destination row
+        result += static_cast<char>('1' + dstCol);  // Destination column
         if (promotionPiece) {
             result += promotionPiece;
         }
@@ -61,7 +61,6 @@ public:
 // Comparator for the Move class to use with PriorityQueue
 struct MoveComparator {
     int operator()(const Move& a, const Move& b) const {
-        // Higher scores should have higher priority (reverse order)
         return b.getScore() - a.getScore();
     }
 };
