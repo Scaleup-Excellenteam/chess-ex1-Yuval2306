@@ -54,4 +54,13 @@ public:
 
     // Track king and rook movements for castling
     void updatePieceMoved(int row, int col, std::shared_ptr<Piece> piece);
+
+    // Castling methods
+    bool canCastleKingside(bool isWhite) const;
+    bool canCastleQueenside(bool isWhite) const;
+    void performCastle(int kingRow, int kingCol, int newKingCol);
+
+    // Getters for castling state (needed for King's isValidMove)
+    bool hasKingMoved(bool isWhite) const;
+    bool hasRookMoved(bool isWhite, bool isKingside) const;
 };
