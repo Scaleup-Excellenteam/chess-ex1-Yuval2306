@@ -47,8 +47,69 @@ std::vector<Move> Game::recommendMoves() {
     }
 }
 
-int Game::validateMove(const std::string& input) {
+std::vector<Move> Game::getAllValidMoves(bool isWhiteTurn) {
+    std::vector<Move> validMoves;
 
+    // Find all valid moves for the current player
+    for (int srcRow = 0; srcRow < 8; srcRow++) {
+        for (int srcCol = 0; srcCol < 8; srcCol++) {
+            auto piece = m_board.getPiece(srcRow, srcCol);
+
+            // Skip if there's no piece or if it belongs to the opponent
+            if (!piece || piece->isWhite() != isWhiteTurn) {
+                continue;
+            }
+
+            // Consider all possible destination squares
+            for (int dstRow = 0; dstRow < 8; dstRow++) {
+                for (int dstCol = 0; dstCol < 8; dstCol++) {
+                    // Skip if source and destination are the same
+                    if (srcRow == dstRow && srcCol == dstCol) {
+                        continue;
+                    }
+
+                    // Check if there's a friendly piece at destination
+                    auto destPiece = m_board.getPiece(dstRow, dstCol);
+                    if (destPiece && destPiece->isWhite() == isWhiteTurn) {
+                        continue; // Can't capture own piece
+                    }
+
+                    // Check if the move is valid for this piece
+                    if (piece->isValidMove(m_board, srcRow, srcCol, dstRow, dstCol)) {
+                        // Check if the move would put the player in check
+                        if (!m_board.wouldBeInCheck(srcRow, srcCol, dstRow, dstCol, isWhiteTurn)) {
+                            validMoves.emplace_back(srcRow, srcCol, dstRow, dstCol);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return validMoves;
+}
+
+bool Game::hasValidMoves(bool isWhiteTurn) {
+    return !getAllValidMoves(isWhiteTurn).empty();
+}
+
+bool Game::isCheckmate(bool isWhiteTurn) {
+    // Checkmate occurs when:
+    // 1. The king is in check
+    // 2. There are no valid moves to get out of check
+
+    return m_board.isKingInCheck(isWhiteTurn) && !hasValidMoves(isWhiteTurn);
+}
+
+bool Game::isStalemate(bool isWhiteTurn) {
+    // Stalemate occurs when:
+    // 1. The king is NOT in check
+    // 2. There are no valid moves available
+
+    return !m_board.isKingInCheck(isWhiteTurn) && !hasValidMoves(isWhiteTurn);
+}
+
+int Game::validateMove(const std::string& input) {
     // Convert input to lowercase for consistency
     std::string lowerInput = input;
     for (char& c : lowerInput) {

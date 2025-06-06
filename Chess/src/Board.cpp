@@ -104,6 +104,13 @@ void Board::movePiece(int srcRow, int srcCol, int dstRow, int dstCol, char promo
     auto piece = getPiece(srcRow, srcCol);
     if (piece) {
         updatePieceMoved(srcRow, srcCol, piece);
+
+        // Check for castling move
+        if (std::toupper(piece->getSymbol()) == 'K' && std::abs(dstCol - srcCol) == 2) {
+            performCastle(srcRow, srcCol, dstCol);
+            return;
+        }
+
         setPiece(dstRow, dstCol, piece);
         removePiece(srcRow, srcCol);
 
@@ -126,12 +133,123 @@ void Board::updatePieceMoved(int row, int col, std::shared_ptr<Piece> piece) {
     } else if (symbol == 'k') {
         m_blackKingMoved = true;
     } else if (symbol == 'R') {
-        if (row == 7 && col == 0) m_whiteLeftRookMoved = true;
-        if (row == 7 && col == 7) m_whiteRightRookMoved = true;
+        if (row == 0 && col == 0) m_whiteLeftRookMoved = true;
+        if (row == 0 && col == 7) m_whiteRightRookMoved = true;
     } else if (symbol == 'r') {
-        if (row == 0 && col == 0) m_blackLeftRookMoved = true;
-        if (row == 0 && col == 7) m_blackRightRookMoved = true;
+        if (row == 7 && col == 0) m_blackLeftRookMoved = true;
+        if (row == 7 && col == 7) m_blackRightRookMoved = true;
     }
+}
+
+bool Board::hasKingMoved(bool isWhite) const {
+    return isWhite ? m_whiteKingMoved : m_blackKingMoved;
+}
+
+bool Board::hasRookMoved(bool isWhite, bool isKingside) const {
+    if (isWhite) {
+        return isKingside ? m_whiteRightRookMoved : m_whiteLeftRookMoved;
+    } else {
+        return isKingside ? m_blackRightRookMoved : m_blackLeftRookMoved;
+    }
+}
+
+bool Board::canCastleKingside(bool isWhite) const {
+    // Check if king or kingside rook has moved
+    if (hasKingMoved(isWhite) || hasRookMoved(isWhite, true)) {
+        return false;
+    }
+
+    int kingRow = isWhite ? 0 : 7;
+    int rookCol = 7;
+
+    // Check if rook is still there
+    auto rook = getPiece(kingRow, rookCol);
+    if (!rook || std::toupper(rook->getSymbol()) != 'R' || rook->isWhite() != isWhite) {
+        return false;
+    }
+
+    // Check if squares between king and rook are empty
+    for (int col = 5; col <= 6; col++) {
+        if (getPiece(kingRow, col) != nullptr) {
+            return false;
+        }
+    }
+
+    // Check if king is currently in check
+    if (isKingInCheck(isWhite)) {
+        return false;
+    }
+
+    // Check if king would pass through or end in check
+    Board tempBoard = getCopy();
+    if (tempBoard.wouldBeInCheck(kingRow, 4, kingRow, 5, isWhite) ||
+        tempBoard.wouldBeInCheck(kingRow, 4, kingRow, 6, isWhite)) {
+        return false;
+    }
+
+    return true;
+}
+
+bool Board::canCastleQueenside(bool isWhite) const {
+    // Check if king or queenside rook has moved
+    if (hasKingMoved(isWhite) || hasRookMoved(isWhite, false)) {
+        return false;
+    }
+
+    int kingRow = isWhite ? 0 : 7;
+    int rookCol = 0;
+
+    // Check if rook is still there
+    auto rook = getPiece(kingRow, rookCol);
+    if (!rook || std::toupper(rook->getSymbol()) != 'R' || rook->isWhite() != isWhite) {
+        return false;
+    }
+
+    // Check if squares between king and rook are empty
+    for (int col = 1; col <= 3; col++) {
+        if (getPiece(kingRow, col) != nullptr) {
+            return false;
+        }
+    }
+
+    // Check if king is currently in check
+    if (isKingInCheck(isWhite)) {
+        return false;
+    }
+
+    // Check if king would pass through or end in check
+    Board tempBoard = getCopy();
+    if (tempBoard.wouldBeInCheck(kingRow, 4, kingRow, 3, isWhite) ||
+        tempBoard.wouldBeInCheck(kingRow, 4, kingRow, 2, isWhite)) {
+        return false;
+    }
+
+    return true;
+}
+
+void Board::performCastle(int kingRow, int kingCol, int newKingCol) {
+    auto king = getPiece(kingRow, kingCol);
+    if (!king) return;
+
+    // Determine if this is kingside or queenside castling
+    bool isKingside = (newKingCol > kingCol);
+
+    int rookCol = isKingside ? 7 : 0;
+    int newRookCol = isKingside ? 5 : 3;
+
+    auto rook = getPiece(kingRow, rookCol);
+
+    // Move king
+    setPiece(kingRow, newKingCol, king);
+    removePiece(kingRow, kingCol);
+
+    // Move rook
+    if (rook) {
+        setPiece(kingRow, newRookCol, rook);
+        removePiece(kingRow, rookCol);
+    }
+
+    std::cout << "Castling performed: " << (isKingside ? "Kingside" : "Queenside") << std::endl;
 }
 
 std::pair<int, int> Board::findKing(bool isWhite) const {

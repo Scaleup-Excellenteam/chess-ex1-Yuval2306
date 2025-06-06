@@ -1,28 +1,125 @@
-# Ignore build files and compiled binaries
+# Build directories and output files
 /build/
-/CMakeCache.txt
-/CMakeFiles/
-/*.o
-/*.a
-/*.so
-/*.exe
-/*.out
+/cmake-build-*/
+/out/
 
-# Ignore IDE and editor configuration files
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+Makefile
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps/
+
+# Compiled object files
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+
+# Executable files
+*.exe
+*.out
+ChessGame
+chess
+chess_game
+
+# IDE and editor configuration files
 .vscode/
+.vs/
 .idea/
+*.vcxproj*
+*.sln
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Editor temporary files
 *.swp
 *.swo
+*~
+*.tmp
+*.temp
+.#*
+\#*#
+.DS_Store
+Thumbs.db
 
-# Ignore GitHub Actions temporary files
-.github/workflows/*.log
-.github/workflows/*.cache
+# Debug and profiling files
+*.pdb
+*.ilk
+*.map
+*.exp
+*.gch
+*.pch
+*.dSYM/
+*.su
+*.idb
+*.ipdb
 
-# Ignore debugging and log files
+# Log and temporary files
 *.log
 *.tmp
 *.bak
+*.backup
+*_backup
+*.orig
+*.rej
 
-# Ignore temporary image cache
+# Package files
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Cache and temporary directories
+.cache/
+tmp/
+temp/
+*.cache
+
+# Test output and coverage files
+*.gcov
+*.gcda
+*.gcno
+coverage/
+*.coverage
+
+# Documentation generated files
+doc/html/
+doc/latex/
+*.pdf
+*.dvi
+
+# System files
+.directory
+desktop.ini
+
+# Ignore any personal configuration files
+config.local
+*.local
+
+# GitHub Actions and CI temporary files
+.github/workflows/*.log
+.github/workflows/*.cache
+
+# Image and media cache
 img/cache/
+images/temp/
+
+# Any additional build artifacts
+bin/
+lib/
+dist/
 
