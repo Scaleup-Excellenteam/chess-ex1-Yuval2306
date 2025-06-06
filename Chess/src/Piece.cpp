@@ -42,7 +42,6 @@ bool Pawn::isValidMove(const Board& board, int srcRow, int srcCol, int dstRow, i
         bool middleEmpty = board.getPiece(srcRow + direction, srcCol) == nullptr;
         bool destEmpty = board.getPiece(dstRow, dstCol) == nullptr;
         bool valid = middleEmpty && destEmpty;
-        //std::cout << "Two squares forward: " << (valid ? "valid" : "invalid") << std::endl;
         return valid;
     }
 
@@ -50,11 +49,9 @@ bool Pawn::isValidMove(const Board& board, int srcRow, int srcCol, int dstRow, i
     if (std::abs(srcCol - dstCol) == 1 && srcRow + direction == dstRow) {
         auto targetPiece = board.getPiece(dstRow, dstCol);
         bool valid = targetPiece != nullptr && targetPiece->isWhite() != m_isWhite;
-        //std::cout << "Diagonal capture: " << (valid ? "valid" : "invalid") << std::endl;
         return valid;
     }
 
-    //std::cout << "No valid pawn move found" << std::endl;
     return false;
 }
 
@@ -66,7 +63,6 @@ bool Rook::isValidMove(const Board& board, int srcRow, int srcCol, int dstRow, i
 
     // Check if the path is clear
     bool pathClear = isPathClear(board, srcRow, srcCol, dstRow, dstCol);
-    //std::cout << "Path clear: " << (pathClear ? "yes" : "no") << std::endl;
     return pathClear;
 }
 
@@ -107,16 +103,44 @@ bool King::isValidMove(const Board& board, int srcRow, int srcCol, int dstRow, i
     int rowDiff = std::abs(srcRow - dstRow);
     int colDiff = std::abs(srcCol - dstCol);
 
+    // Normal king move: one square in any direction
     if (rowDiff <= 1 && colDiff <= 1) {
         return true;
     }
 
-    // Check for castling
-    return canCastle(board, srcRow, srcCol, dstRow, dstCol);
+    // Check for castling - king moves 2 squares horizontally
+    if (rowDiff == 0 && colDiff == 2) {
+        return canCastle(board, srcRow, srcCol, dstRow, dstCol);
+    }
+
+    return false;
 }
 
-// Castling is not implemented in this simplified version
 bool King::canCastle(const Board& board, int srcRow, int srcCol, int dstRow, int dstCol) const {
-    // For a full implementation, we would check king and rook movement history and ensure the king doesn't move through check
-    return false;
+    // Castling conditions:
+    // 1. King and rook must not have moved
+    // 2. No pieces between king and rook
+    // 3. King is not in check
+    // 4. King doesn't pass through or end in check
+
+    // Must be on the same row
+    if (srcRow != dstRow) {
+        return false;
+    }
+
+    // King must move exactly 2 squares
+    int colDiff = dstCol - srcCol;
+    if (std::abs(colDiff) != 2) {
+        return false;
+    }
+
+    // Determine if this is kingside or queenside castling
+    bool isKingside = (colDiff > 0);
+
+    // Check specific castling conditions
+    if (isKingside) {
+        return board.canCastleKingside(m_isWhite);
+    } else {
+        return board.canCastleQueenside(m_isWhite);
+    }
 }
