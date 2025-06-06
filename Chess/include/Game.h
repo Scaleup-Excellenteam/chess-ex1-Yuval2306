@@ -14,13 +14,15 @@ private:
     int m_depthLevel;
     std::vector<Move> m_lastRecommendedMoves; // Store last recommendations
 
+    // Helper method to get all valid moves for a player
+    std::vector<Move> getAllValidMoves(bool isWhiteTurn);
+
 public:
     Game(const std::string& boardString, int numThreads = 4);
     ~Game();
 
     // Set the search depth for move recommendations
     void setSearchDepth(int depth);
-
 
     // Check if the move is valid and return the response code
     int validateMove(const std::string& input);
@@ -30,4 +32,13 @@ public:
 
     // Recommend moves and return them
     std::vector<Move> recommendMoves();
+
+    // Checkmate detection
+    bool isCheckmate(bool isWhiteTurn);
+
+    // Stalemate detection
+    bool isStalemate(bool isWhiteTurn);
+
+    // Check if player has any valid moves
+    bool hasValidMoves(bool isWhiteTurn);
 };
